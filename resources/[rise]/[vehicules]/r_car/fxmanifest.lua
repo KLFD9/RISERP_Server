@@ -7,10 +7,10 @@ description 'Rise Car'
 version '1.0.0'
 
 client_scripts {
-    'client/commands.lua',
-    'client/controls.lua',
+    'client/commands.lua'
+    'client/controls.lua'
 }
 
 server_scripts {
-    'server/server.lua',
+    'server/server.lua'
 }

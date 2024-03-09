@@ -37,13 +37,14 @@ RegisterCommand("car", function(source, args)
         SetVehicleEngineHealth(vehicle, initialEngineHealth)
         SetVehicleBodyHealth(vehicle, initialBodyHealth)
 
-        
-        local vehicleMaxSpeed = GetVehicleMaxSpeed(vehicle) * 3.6 -- Vitesse maximale en km/h
-        TriggerEvent("chat:addMessage", {
-            color = {255, 255, 0},
-            multiline = true,
-            args = {"[Car]", "Vehicle livré: " .. vehicleName .. ", Vitesse max: " .. math.floor(vehicleMaxSpeed) .. " mph"}
-        })
+        local message = "Vehicle livré: " .. vehicleName .. ", Vitesse max: " .. vehicleMaxSpeedMph .. " Km/h"
+        local vehicleMaxSpeedMph = GetVehicleMaxSpeed(vehicle) * 3.6 -- Vitesse maximale en km/h
+       
+        ThefeedNextPostBackgroundColor(184)
+        SetNotificationTextEntry("STRING")
+        AddTextComponentString(message)
+        SetNotificationMessage("CHAR_RICKIE", "CHAR_RICKIE", true, 1, "~y~Le Mécanno", "")
+        DrawNotification(false, true)
     else
         TriggerEvent("chat:addMessage", {
             color = {255, 0, 0},
