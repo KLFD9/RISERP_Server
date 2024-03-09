@@ -1,0 +1,135 @@
+@import url("https://fonts.googleapis.com/css2?family=Righteous&display=swap");
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background-color: transparent;
+    font-family: "Righteous";
+}
+
+#contSpeedo {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 450px;
+    height: 10rem;
+    background: rgb(1,1,1);
+    background: linear-gradient(150deg, rgba(22, 20, 34,0) 35%, rgba(22, 20, 34, 0.466) 90%);
+    z-index: 1000;
+}
+
+.info_vitesse, .info_tech {
+    display: flex;
+    align-items: center;
+  }
+
+#speedometer {
+    font-size: 6em;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    text-shadow: 0 4px 1px rgba(240, 240, 240, 0.863);
+    transform: skewX(-20deg);
+    text-align: right;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 4vw;
+}
+
+#speedometer::before {
+    content: "000";
+    color: #fcf8f862;
+    margin-right: 0.5vw;  
+    font-weight: 800;
+    text-shadow: 0 4px 1px rgba(122, 122, 122, 0.178);
+    position: absolute;
+    z-index: -2;
+    top: 0;
+    right: -6px;
+  }
+#speedometer::after {
+    content: "km/h";
+    font-weight: 500;
+    text-shadow: 0 4px 1px rgba(255, 255, 255, 0.541);
+    position: absolute;
+    font-size: 1rem;
+    z-index: -2;
+    top: 20px;
+    right: -2.3vw;
+  }
+
+
+#contSpeedo.hidden {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.5s, opacity 0.5s linear; /* Disparaît progressivement */
+}
+
+#gearbox {
+    font-size: 2.3em;
+    color: #f8b34c;
+    margin-right: 0.5vw;
+    top: 60px;
+    right: 10px;
+    position: absolute;
+    text-shadow: 0 2px 1px rgba(2, 2, 2, 0.185);
+  }
+
+  .info_tech {
+    bottom: 15%;
+    right: 10px;
+    position: absolute;
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+.fuel, .carHeal {
+        font-size: 1.2rem;
+        color: #ffffff;
+        margin-left: 0.5vw;
+        text-shadow: 0 2px 1px rgba(2, 2, 2, 0.185);
+        margin: 0 10px;
+}
+
+.bx {
+    color: rgb(243, 150, 28);
+    font-size: 1.2rem;
+    text-shadow: 0 2px 1px rgba(2, 2, 2, 0.185);
+}
+
+@keyframes blink {
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
+
+.blink {
+    animation: blink 1s linear infinite;
+}
+
+#fuelIcon, .bx{
+    font-size: 1.2rem;
+    color: #f8b34c;
+    margin-right: 0.5vw;
+    text-shadow: 0 2px 1px rgba(2, 2, 2, 0.185);
+}
+
+#leftIndicator, #rightIndicator {
+    font-size: 1.2rem;
+    color: rgb(133, 133, 133);
+    background: rgb(212,156,44);
+    background: radial-gradient(circle, rgba(212,156,44,1) 0.5%, rgba(203,148,8,0) 90%);
+  font-size: 1.2rem;
+}
+
+.hidden {
+  display: none;
+}
