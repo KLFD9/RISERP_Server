@@ -1,10 +1,3 @@
--- commande pour ouvrir et fermer le capot du vehicule
-AddEventHandler('onClientResourceStart', function(resourceName)
-    if resourceName == GetCurrentResourceName() then
-        SendNUIMessage({ type = 'onNuiReady' })
-    end
-end)
-
 RegisterCommand('+openhood', function()
     local playerId = PlayerPedId()
     local playerVehicle = GetVehiclePedIsIn(playerId, false) 
@@ -82,20 +75,6 @@ end)
 --------------------------------------------------------------------------------
  -- Clignotants et feux de détresse
 --------------------------------------------------------------------------------
-local indicatorStatus = {}
-
-function UpdateIndicatorStatusToUI(vehicle)
-    local vehNetId = NetworkGetNetworkIdFromEntity(vehicle)
-    if indicatorStatus[vehNetId] ~= nil then
-        SendNUIMessage({
-            type = 'updateIndicators',
-            leftIndicator = indicatorStatus[vehNetId].left,
-            rightIndicator = indicatorStatus[vehNetId].right,
-            hazardLights = indicatorStatus[vehNetId].left and indicatorStatus[vehNetId].right
-        })
-    end
-end
-
 RegisterCommand('+toggleleftindicator', function()
     local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if playerVehicle <= 0 then return end
@@ -221,7 +200,7 @@ RegisterKeyMapping('+toggleengine', 'Démarrer/Arrêter le moteur', 'keyboard', 
 -- Consommation de carburant en fonction de la vitesse et de l'accélération du véhicule
 ----------------------------------------------------------------------------------------
 
-local updateInterval = 5000 
+local updateInterval = 3000 
 local lastUpdate = GetGameTimer()
 local previousSpeed = 0.0
 local previousTimestamp = GetGameTimer()
@@ -259,7 +238,6 @@ Citizen.CreateThread(function()
 
                     SetVehicleFuelLevel(vehicle, newFuelLevel)
                     TriggerServerEvent('server:UpdateFuelLevel', newFuelLevel)
-                    SendNUIMessage({ type = 'updateFuel', fuel = fuelPercentage })
                     if newFuelLevel <= 0 then
                         SetVehicleEngineOn(vehicle, false, false, true)
                     end
@@ -271,7 +249,6 @@ Citizen.CreateThread(function()
             lastUpdate = currentTime 
         end
     end
-end
 end)
 
 
@@ -294,12 +271,11 @@ Citizen.CreateThread(function()
             local overallHealth = math.floor((normalizedEngineHealth + normalizedBodyHealth) / 2) -- Moyenne des deux
 
             if not lastOverallHealth or math.abs(overallHealth - lastOverallHealth) >= 5 then
-                SendNUIMessage({ type = 'updateHealth', health = overallHealth })
+                print(overallHealth)
                 lastOverallHealth = overallHealth
             end
         else
-            if lastOverallHealth ~= nil then                
-                SendNUIMessage({ type = 'updateHealth', health = 100 })
+            if lastOverallHealth ~= nil then 
                 lastOverallHealth = nil
             end
         end

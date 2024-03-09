@@ -60,7 +60,7 @@ end)
 RegisterCommand("fix", function()
     local playerPed = GetPlayerPed(-1)
     local coords = GetEntityCoords(playerPed)
-    local vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0, 0, 70)
+    local vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 2.0, 0, 70)
 
     if DoesEntityExist(vehicle) then        
         local fuelLevel = GetVehicleFuelLevel(vehicle)        
@@ -145,24 +145,35 @@ end)
 -----------------------------------------------------------------------------------------------------------------------
 RegisterCommand("clean", function()
     local playerPed = GetPlayerPed(-1)
-    local vehicle = GetVehiclePedIsIn(playerPed, false)
+    local coords = GetEntityCoords(playerPed)
+    local vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0, 0, 70)
 
     if DoesEntityExist(vehicle) then
-        SetVehicleDirtLevel(vehicle, 0)
-        TriggerEvent("chat:addMessage", {
-            color = {0, 255, 0},
-            multiline = true,
-            args = {"[Car]", "Vehicle nettoyé"}
-        })
+        if IsPedInAnyVehicle(playerPed, false) then
+            ThefeedNextPostBackgroundColor(128)
+            SetNotificationTextEntry("STRING")
+            AddTextComponentString("Sortez du véhicule pour effectuer le nettoyage", 1000)
+            SetNotificationMessage("CHAR_RICKIE", "CHAR_RICKIE", true, 1, "~y~Le Mécanno", "")
+            DrawNotification(false, true)
+        else
+            TaskStartScenarioInPlace(playerPed, "WORLD_HUMAN_MAID_CLEAN", 0, true)
+            Citizen.Wait(10000) -- Wait for 10 seconds
+            ClearPedTasks(playerPed)
+            SetVehicleDirtLevel(vehicle, 0) -- Clean the vehicle after the animation
+            ThefeedNextPostBackgroundColor(184)
+            SetNotificationTextEntry("STRING")
+            AddTextComponentString("Véhicule nettoyé, aller roulez jeunesse !", 1000)
+            SetNotificationMessage("CHAR_RICKIE", "CHAR_RICKIE", true, 1, "~y~Le Mécanno", "")
+            DrawNotification(false, true)
+        end
     else
-        TriggerEvent("chat:addMessage", {
-            color = {255, 0, 0},
-            multiline = true,
-            args = {"[Car]", "Pas de véhicule trouvé"}
-        })
+        ThefeedNextPostBackgroundColor(6)
+        SetNotificationTextEntry("STRING")
+        AddTextComponentString("Pas de véhicule à proximité", 1000)
+        SetNotificationMessage("CHAR_RICKIE", "CHAR_RICKIE", true, 1, "~y~Le Mécanno", "")
+        DrawNotification(false, true)
     end
 end)
-
 -----------------------------------------------------------------------------------------------------------------------
 -- Commande pour changer la couleur du vehicule
 -----------------------------------------------------------------------------------------------------------------------
