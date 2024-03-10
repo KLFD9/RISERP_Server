@@ -1,7 +1,7 @@
 -- Charger le fichier JSON
 local file = LoadResourceFile(GetCurrentResourceName(), "GasStations.json")
 local data = json.decode(file)
-local gasStations = data.GasStations  -- Accéder au tableau GasStations
+local gasStations = data.GasStations
 
 -- Liste des modèles de pompes à essence
 local props = {
@@ -48,7 +48,6 @@ function ShowNotification(text)
     DrawNotification(false, false)
 end
 
--- Événement pour vérifier la proximité d'une pompe à essence
 RegisterNetEvent('checkForGasPump')
 AddEventHandler('checkForGasPump', function()
     local player = GetPlayerPed(-1)
@@ -83,12 +82,12 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(3000)  -- Continue à vérifier toutes les 3 secondes
+        Citizen.Wait(3000)
         TriggerEvent('checkForGasPump')
     end
 end)
 
--- Définir l'animation de remplissage
+-- animation de remplissage
 function StartRefuelingAnimation(player)
     local dict = "timetable@gardener@filling_can"
     local anim = "gar_ig_5_filling_can"
@@ -97,11 +96,10 @@ function StartRefuelingAnimation(player)
     while not HasAnimDictLoaded(dict) do
         Citizen.Wait(100)
     end
-    
+
     TaskPlayAnim(player, dict, anim, 8.0, -8, -1, 49, 0, false, false, false)
 end
 
--- Événement pour le processus de ravitaillement
 RegisterNetEvent('startRefueling')
 AddEventHandler('startRefueling', function()
     local player = GetPlayerPed(-1)
@@ -121,7 +119,7 @@ end)
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        if IsControlJustReleased(0, 38) then -- E key
+        if IsControlJustReleased(0, 38) then -- Touche E
             local player = GetPlayerPed(-1)
             if isPlayerNearReferencedPump(player) then
                 TriggerEvent('startRefueling')

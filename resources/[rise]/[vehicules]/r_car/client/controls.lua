@@ -75,6 +75,10 @@ end)
 --------------------------------------------------------------------------------
  -- Clignotants et feux de détresse
 --------------------------------------------------------------------------------
+
+
+indicatorStatus = {} 
+
 RegisterCommand('+toggleleftindicator', function()
     local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if playerVehicle <= 0 then return end
@@ -84,10 +88,8 @@ RegisterCommand('+toggleleftindicator', function()
     end
     indicatorStatus[vehNetId].left = not indicatorStatus[vehNetId].left
     SetVehicleIndicatorLights(playerVehicle, 1, indicatorStatus[vehNetId].left)
-    UpdateIndicatorStatusToUI(playerVehicle)
 end)
 
--- Activer/désactiver le clignotant droit
 RegisterCommand('+togglerightindicator', function()
     local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if playerVehicle <= 0 then return end
@@ -97,10 +99,8 @@ RegisterCommand('+togglerightindicator', function()
     end
     indicatorStatus[vehNetId].right = not indicatorStatus[vehNetId].right
     SetVehicleIndicatorLights(playerVehicle, 0, indicatorStatus[vehNetId].right)
-    UpdateIndicatorStatusToUI(playerVehicle)
 end)
 
--- Activer/désactiver les feux de détresse
 RegisterCommand('+togglehazardlights', function()
     local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if playerVehicle <= 0 then return end
@@ -113,7 +113,6 @@ RegisterCommand('+togglehazardlights', function()
     indicatorStatus[vehNetId].right = newState
     SetVehicleIndicatorLights(playerVehicle, 1, newState)
     SetVehicleIndicatorLights(playerVehicle, 0, newState)
-    UpdateIndicatorStatusToUI(playerVehicle)
 end)
 
 
@@ -232,6 +231,12 @@ Citizen.CreateThread(function()
                     local maxFuelLevel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume')
                     local fuelPercentage = (newFuelLevel / maxFuelLevel) * 100
 
+                    -- Envoyer le niveau de carburant à l'interface utilisateur
+                    SendNUIMessage({
+                        type = 'update',
+                        fuel = fuelPercentage
+                    })
+
                     SetVehicleFuelLevel(vehicle, newFuelLevel)
                     TriggerServerEvent('server:UpdateFuelLevel', newFuelLevel)
                     if newFuelLevel <= 0 then
@@ -293,7 +298,7 @@ AddEventHandler('vehicleImpact', function(speedDifference)
         end
 
         -- Affichage du niveau de santé après l'impact avec notification
-        ShowNotification("Santé du véhicule après impact: Moteur - " .. math.floor(GetVehicleEngineHealth(vehicle)) .. ", Carrosserie - " .. math.floor(GetVehicleBodyHealth(vehicle)))
+        ShowNotification("~y~Impact Santé: Moteur - " .. math.floor(GetVehicleEngineHealth(vehicle)) .. ", Carrosserie - " .. math.floor(GetVehicleBodyHealth(vehicle)))
     end
 end)
 
@@ -302,3 +307,20 @@ function ShowNotification(text)
     AddTextComponentString(text)
     DrawNotification(false, false)
 end
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1000) 
+        local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+        if playerVehicle ~= 0 and GetIsVehicleEngineRunning(playerVehicle) then
+            local speed = GetEntitySpeed(playerVehicle) * 3.6  -- Convertir la vitesse en km/h
+            local gear = GetVehicleCurrentGear(playerVehicle)
+            local fuel = GetVehicleFuelLevel(playerVehicle)
+            local health = GetVehicleEngineHealth(playerVehicle)
+
+            -- Envoyer les informations au script speedometer
+            TriggerEvent('speedometer:update', speed, gear, fuel, health)
+        end
+    end
+end)
+

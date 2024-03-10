@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container" id="contSpeedo" >
+    <div class="container" id="contSpeedo" style="display: none;" >
 
         <div class="info_vitesse">            
         <div id="speedometer" class="kmh">0</div>
@@ -26,5 +26,19 @@
     </div>
     
     <script src="script.js"></script>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            var item = event.data;
+            if (item.type === "speedometer") {
+                document.getElementById('speedometer').innerHTML = item.speed;
+                document.getElementById('gearbox').innerHTML = item.gear;
+                document.getElementById('fuelLevel').innerHTML = item.fuel;
+                document.getElementById('vehicleHealth').innerHTML = item.health;                
+            }
+        });
+
+
+    </script>
 </body>
 </html>
