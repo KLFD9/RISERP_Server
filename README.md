@@ -1,27 +1,34 @@
-# RISE RP - Serveur Roleplay En auto Gestion sur FiveM
+# 🌟 RISE RP - Serveur Roleplay Autogéré sur FiveM 🌟
 
-Bienvenue dans le projet RISE Server! Ce serveur FiveM est un serveur de jeu de rôle (roleplay) indépendant pour GTA5. Il est conçu pour offrir une expérience de jeu immersive et réaliste dans un environnement en constante évolution.
+![RISE RP](https://discord.com/channels/368362968984846338/379376488878702593/1216339898127224893)
 
-## Fonctionnalités
+Bienvenue sur le projet **RISE (R.I.S.E)**, une aventure unique dans l'univers de GTA5 sur FiveM. Notre serveur de jeu de rôle (roleplay) se distingue par son approche novatrice, visant à offrir une expérience immersive et réaliste. Conçu from scratch, chaque script est peaufiné pour assurer efficacité, harmonie et optimisation sans précédent. Sans prétention, RISE RP se consacre à la passion du développement et au partage avec la communauté.
 
-- En developpement
+## 🚀 Fonctionnalités Uniques
 
-## Comment nous rejoindre
+- **Développement sur Mesure** : Contrairement aux serveurs utilisant ESX ou QbCore, RISE RP privilégie le développement personnalisé pour une expérience de jeu sans compromis.
+- **Optimisation Avancée** : Chaque script est élaboré avec soin pour une performance maximale et une intégration parfaite.
+- **Expérience Rafraîchie** : Nous apportons une touche de fraîcheur et de simplicité, redonnant vie à l'essence du roleplay.
 
-1. Assurez-vous d'avoir une copie légale de GTA5 sur PC.
-2. Téléchargez et installez FiveM à partir de [https://fivem.net/](https://fivem.net/).
-3. Lancez FiveM et recherchez " [FR] RISE" dans la liste des serveurs.
-4. Rejoignez notre communauté et commencez à jouer!
+## 🌐 Comment nous rejoindre
 
-## Contribution
+1. Assurez-vous d'avoir **GTA5 sur PC**.
+2. Installez **FiveM** via [https://fivem.net/](https://fivem.net/).
+3. Lancez FiveM et recherchez "**[FR] RISE**" pour nous trouver.
+4. Rejoignez-nous pour une expérience inoubliable!
 
-Nous encourageons les contributions à notre projet!
+## 💡 Contribuez à l'Aventure
 
-## Support
+Votre passion et votre créativité peuvent aider RISE RP à grandir. Nous encourageons les contributions sous toutes leurs formes. Partagez vos idées, vos scripts ou simplement votre soutien. Chaque geste compte!
 
-Si vous avez des questions, des problèmes ou des suggestions, n'hésitez pas à nous contacter via notre serveur Discord ou à ouvrir une issue dans notre dépôt GitHub.
+## 📞 Support et Communauté
 
-## Licence
+Des questions? Des suggestions? Rejoignez notre communauté dynamique sur **Discord** ou contactez-nous directement via notre dépôt GitHub. Votre voix est importante pour nous.
 
-Ce projet est sous licence MIT.
-Veuillez consulter le fichier LICENCE pour plus d'informations.
+## 📜 Licence
+
+RISE RP est fier d'être un projet ouvert, sous licence **MIT**. Pour plus de détails, consultez le fichier LICENCE.
+
+---
+
+RISE RP est plus qu'un serveur, c'est une passion partagée pour le développement, le jeu et la communauté. Ensemble, redéfinissons le roleplay sur FiveM. **Rejoignez l'aventure RISE et contribuez à façonner l'avenir du roleplay!** 🌈✨
