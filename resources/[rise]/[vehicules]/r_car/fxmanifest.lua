@@ -7,7 +7,7 @@ description 'Rise Car'
 version '1.0.0'
 
 client_scripts {
-    'client/commands.lua'
+    'client/commands.lua',
     'client/controls.lua'
 }
 
