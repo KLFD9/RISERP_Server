@@ -197,6 +197,10 @@ RegisterKeyMapping('+toggleengine', 'Démarrer/Arrêter le moteur', 'keyboard', 
 
 
 local lastUpdate = 0 
+local updateInterval = 1000  
+local previousTimestamp = 0  
+local previousSpeed = 0  
+local consumptionMultiplier = 1  
 
 Citizen.CreateThread(function()
     while true do
@@ -216,7 +220,7 @@ Citizen.CreateThread(function()
                     else
                         local deltaTime = (currentTime - previousTimestamp) / 1000.0 
                         local acceleration = (currentSpeed - previousSpeed) / deltaTime
-                        consumptionRate = (0.0010 + acceleration * 0.0025 * currentSpeed) * consumptionMultiplier
+                        consumptionRate = (0.0010 + acceleration * 0.0025 * currentSpeed) * consumptionMultiplier 
                         consumptionRate = math.max(consumptionRate, 0)
                     end
 
@@ -239,10 +243,12 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+--------------------------------------------------------------------------------
 -- Mise à jour de la santé globale du véhicule avec prise en compte de la vitesse et des impacts
 ----------------------------------------------------------------------------------------
 local lastSpeed = 0
-local healthDropOnImpact = 500 -- Quantité de santé à retirer sur un impact significatif
+local healthDropOnImpact = 50
 
 Citizen.CreateThread(function()
     while true do
@@ -251,12 +257,12 @@ Citizen.CreateThread(function()
         local playerPed = PlayerPedId()
         if IsPedInAnyVehicle(playerPed, false) then
             local vehicle = GetVehiclePedIsIn(playerPed, false)
-            local currentSpeed = GetEntitySpeed(vehicle) * 3.6 -- Converti en km/h
+            local currentSpeed = GetEntitySpeed(vehicle) * 3.6 
             local speedDifference = math.abs(currentSpeed - lastSpeed)
             
-            -- Détecter un impact significatif basé sur le changement de vitesse
-            if speedDifference >= 30 then -- Seuil de changement de vitesse signifiant un impact
-                TriggerEvent('vehicleImpact', speedDifference) -- Événement personnalisé pour gérer l'impact
+            -- Détecter un impact
+            if speedDifference >= 30 then 
+                TriggerEvent('vehicleImpact', speedDifference)
             end
             
             lastSpeed = currentSpeed
@@ -264,6 +270,7 @@ Citizen.CreateThread(function()
     end
 end)
 
+-- Gérer l'impact sur le véhicule
 AddEventHandler('vehicleImpact', function(speedDifference)
     local playerPed = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(playerPed, false)
@@ -271,15 +278,15 @@ AddEventHandler('vehicleImpact', function(speedDifference)
         local engineHealth = GetVehicleEngineHealth(vehicle)
         local bodyHealth = GetVehicleBodyHealth(vehicle)
 
-        -- Appliquer des dégâts basés sur la différence de vitesse (impact plus fort = plus de dégâts)
-        local damage = healthDropOnImpact * (speedDifference / 2) -- Augmenter les dégâts en fonction de la vitesse de l'impact
+        -- Calculer les dégâts à infliger au véhicule
+        local damage = healthDropOnImpact * (speedDifference / 10)
         SetVehicleEngineHealth(vehicle, engineHealth - damage)
         SetVehicleBodyHealth(vehicle, bodyHealth - damage)
 
         -- Possibilité de perdre une roue sur un très gros impact
-        if speedDifference >= 50 and math.random() < 0.5 then -- Seuil pour une probabilité élevée de perdre une roue
-            local wheelID = math.random(0, 3) -- Choisir une roue aléatoire à endommager
-            SetVehicleTyreBurst(vehicle, wheelID, true, 1000.0)-- Endommager la roue
+        if speedDifference >= 30 and math.random() < 0.5 then 
+            local wheelID = math.random(0, 3)
+            SetVehicleTyreBurst(vehicle, wheelID, true, 1000.0)
         end
 
         -- Affichage du niveau de santé après l'impact avec notification

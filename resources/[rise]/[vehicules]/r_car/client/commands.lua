@@ -37,8 +37,8 @@ RegisterCommand("car", function(source, args)
         SetVehicleEngineHealth(vehicle, initialEngineHealth)
         SetVehicleBodyHealth(vehicle, initialBodyHealth)
 
-        local message = "Vehicle livré: " .. vehicleName .. ", Vitesse max: " .. vehicleMaxSpeedMph .. " Km/h"
         local vehicleMaxSpeedMph = GetVehicleMaxSpeed(vehicle) * 3.6 -- Vitesse maximale en km/h
+        local message = "Vehicle livré: " .. vehicleName .. ", Vitesse max: " .. vehicleMaxSpeedMph .. " Km/h"
        
         ThefeedNextPostBackgroundColor(184)
         SetNotificationTextEntry("STRING")
