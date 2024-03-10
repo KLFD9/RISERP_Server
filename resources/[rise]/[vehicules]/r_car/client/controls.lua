@@ -292,13 +292,13 @@ AddEventHandler('vehicleImpact', function(speedDifference)
         SetVehicleBodyHealth(vehicle, bodyHealth - damage)
 
         -- Possibilité de perdre une roue sur un très gros impact
-        if speedDifference >= 30 and math.random() < 0.5 then 
+        if speedDifference >= 20 and math.random() < 0.5 then 
             local wheelID = math.random(0, 3)
             SetVehicleTyreBurst(vehicle, wheelID, true, 1000.0)
         end
 
         -- Affichage du niveau de santé après l'impact avec notification
-        ShowNotification("~y~Impact Santé: Moteur - " .. math.floor(GetVehicleEngineHealth(vehicle)) .. ", Carrosserie - " .. math.floor(GetVehicleBodyHealth(vehicle)))
+        ShowNotification("~y~Impact Santé: Moteur - " .. math.floor(GetVehicleEngineHealth(vehicle) / 10) .. "%, Carrosserie - " .. math.floor(GetVehicleBodyHealth(vehicle) / 10) .. "%")
     end
 end)
 

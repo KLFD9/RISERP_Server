@@ -37,7 +37,8 @@ RegisterCommand("car", function(source, args)
         SetVehicleEngineHealth(vehicle, initialEngineHealth)
         SetVehicleBodyHealth(vehicle, initialBodyHealth)
 
-        local vehicleMaxSpeedMph = GetVehicleMaxSpeed(vehicle) * 3.6 -- Vitesse maximale en km/h
+        local vehicleSpeedMph = math.floor(GetEntitySpeed(vehicle) * 3.6) -- Vitesse actuelle en km/h, arrondie à l'entier inférieur
+        local vehicleMaxSpeedMph = math.floor(GetVehicleMaxSpeed(vehicle) * 3.6) -- Vitesse maximale en km/h, arrondie à l'entier inférieur
         local message = "Vehicle livré: " .. vehicleName .. ", Vitesse max: " .. vehicleMaxSpeedMph .. " Km/h"
        
         ThefeedNextPostBackgroundColor(184)
