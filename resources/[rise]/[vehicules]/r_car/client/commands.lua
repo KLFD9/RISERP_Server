@@ -273,40 +273,21 @@ RegisterCommand("sup", function()
 end)
 
 -----------------------------------------------------------------------------------------------------------------------
--- Commande "refuel" pour faire le plein de carburant ( sans argent)
+-- Commande "refuel" simple
 -----------------------------------------------------------------------------------------------------------------------
 RegisterCommand("refuel", function()
     local playerPed = GetPlayerPed(-1)
-    local playerCoords = GetEntityCoords(playerPed)
-    local vehicle = GetClosestVehicle(playerCoords.x, playerCoords.y, playerCoords.z, 4.0, 0, 70)
+    local vehicle = GetVehiclePedIsIn(playerPed, false)
+    local fuelLevel = GetVehicleFuelLevel(vehicle)
+    local maxFuelLevel = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fPetrolTankVolume")
+    local missingFuel = maxFuelLevel - fuelLevel
 
-    if DoesEntityExist(vehicle) then
-        local fuelLevel = GetVehicleFuelLevel(vehicle)
-        local maxFuelLevel = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fPetrolTankVolume")
-        local missingFuel = maxFuelLevel - fuelLevel
-        local fuelCost = missingFuel * 1.5 -- 1.5$ par unité de carburant
-
-        if missingFuel > 0 then
-            SetVehicleFuelLevel(vehicle, maxFuelLevel)
-            DecorSetFloat(vehicle, "_FUEL_LEVEL", maxFuelLevel)
-            TriggerEvent("chat:addMessage", {
-                color = {0, 255, 0},
-                multiline = true,
-                args = {"[Car]", "Véhicule rempli d'essence"}
-            })
-        else
-            TriggerEvent("chat:addMessage", {
-                color = {255, 0, 0},
-                multiline = true,
-                args = {"[Car]", "Le réservoir est déjà plein"}
-            })
-        end
+    if missingFuel > 0 then
+        SetVehicleFuelLevel(vehicle, maxFuelLevel)
+        DecorSetFloat(vehicle, "_FUEL_LEVEL", maxFuelLevel)
+        ShowNotification("~y~Le Véhicule à maintenant le plein d'essence !")
     else
-        TriggerEvent("chat:addMessage", {
-            color = {255, 0, 0},
-            multiline = true,
-            args = {"[Car]", "Pas de véhicule trouvé"}
-        })
+        ShowNotification("~g~Vous avez déja le plein du véhicule.")
     end
 end)
 
