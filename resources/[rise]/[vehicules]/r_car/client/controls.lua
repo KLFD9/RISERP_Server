@@ -196,18 +196,6 @@ RegisterKeyMapping('+toggleengine', 'Démarrer/Arrêter le moteur', 'keyboard', 
 
 
 
-----------------------------------------------------------------------------------------
--- Consommation de carburant en fonction de la vitesse et de l'accélération du véhicule
-----------------------------------------------------------------------------------------
-
-local updateInterval = 3000 
-local lastUpdate = GetGameTimer()
-local previousSpeed = 0.0
-local previousTimestamp = GetGameTimer()
-
-
-local consumptionMultiplier = 1.5
-
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(2000)
@@ -224,13 +212,12 @@ Citizen.CreateThread(function()
                     if currentSpeed < 0.1 then 
                         consumptionRate = 0.0001
                     else
-                        
                         local deltaTime = (currentTime - previousTimestamp) / 1000.0 
                         local acceleration = (currentSpeed - previousSpeed) / deltaTime
                         consumptionRate = (0.0010 + acceleration * 0.0025 * currentSpeed) * consumptionMultiplier
                         consumptionRate = math.max(consumptionRate, 0)
+                    end
 
-                    
                     local newFuelLevel = fuelLevel - consumptionRate
                     newFuelLevel = math.max(newFuelLevel, 0)
                     local maxFuelLevel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume')
@@ -250,7 +237,6 @@ Citizen.CreateThread(function()
         end
     end
 end)
-
 
 -- Mise à jour de la santé globale du véhicule avec prise en compte de la vitesse et des impacts
 ----------------------------------------------------------------------------------------
