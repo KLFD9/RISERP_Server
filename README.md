@@ -1,6 +1,6 @@
 # 🌟 RISE RP - Serveur Roleplay Autogéré sur FiveM 🌟
 
-![RISE RP](https://discord.com/channels/368362968984846338/379376488878702593/1216339898127224893)
+![RISE RP](https://ibb.co/vLfrhf6)
 
 Bienvenue sur le projet **RISE (R.I.S.E)**, une aventure unique dans l'univers de GTA5 sur FiveM. Notre serveur de jeu de rôle (roleplay) se distingue par son approche novatrice, visant à offrir une expérience immersive et réaliste. Conçu from scratch, chaque script est peaufiné pour assurer efficacité, harmonie et optimisation sans précédent. Sans prétention, RISE RP se consacre à la passion du développement et au partage avec la communauté.
 
