@@ -9,7 +9,7 @@ AddEventHandler('onClientMapStart', function()
             model = 's_m_y_blackops_01'
         }, function()
             TriggerEvent('chat:addMessage', {
-                args = { 'Welcome to R.I.S.E!' }
+                args = { 'Bienvenu sur R.I.S.E!' }
             })
         end)
     end)
