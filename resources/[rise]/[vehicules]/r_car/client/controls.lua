@@ -195,6 +195,9 @@ RegisterKeyMapping('+togglelights', 'Allumer/Éteindre les lumières', 'keyboard
 RegisterKeyMapping('+toggleengine', 'Démarrer/Arrêter le moteur', 'keyboard', 'G')
 
 
+--------------------------------------------------------------------------------
+-- Mise à jour de la consommation de carburant en fonction de la vitesse
+--------------------------------------------------------------------------------
 
 local lastUpdate = 0 
 local updateInterval = 1000  

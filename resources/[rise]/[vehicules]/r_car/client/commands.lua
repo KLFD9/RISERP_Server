@@ -272,3 +272,44 @@ RegisterCommand("sup", function()
     end
 end)
 
+-----------------------------------------------------------------------------------------------------------------------
+-- Commande "refuel" pour faire le plein de carburant ( sans argent)
+-----------------------------------------------------------------------------------------------------------------------
+RegisterCommand("refuel", function()
+    local playerPed = GetPlayerPed(-1)
+    local playerCoords = GetEntityCoords(playerPed)
+    local vehicle = GetClosestVehicle(playerCoords.x, playerCoords.y, playerCoords.z, 4.0, 0, 70)
+
+    if DoesEntityExist(vehicle) then
+        local fuelLevel = GetVehicleFuelLevel(vehicle)
+        local maxFuelLevel = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fPetrolTankVolume")
+        local missingFuel = maxFuelLevel - fuelLevel
+        local fuelCost = missingFuel * 1.5 -- 1.5$ par unité de carburant
+
+        if missingFuel > 0 then
+            SetVehicleFuelLevel(vehicle, maxFuelLevel)
+            DecorSetFloat(vehicle, "_FUEL_LEVEL", maxFuelLevel)
+            TriggerEvent("chat:addMessage", {
+                color = {0, 255, 0},
+                multiline = true,
+                args = {"[Car]", "Véhicule rempli d'essence"}
+            })
+        else
+            TriggerEvent("chat:addMessage", {
+                color = {255, 0, 0},
+                multiline = true,
+                args = {"[Car]", "Le réservoir est déjà plein"}
+            })
+        end
+    else
+        TriggerEvent("chat:addMessage", {
+            color = {255, 0, 0},
+            multiline = true,
+            args = {"[Car]", "Pas de véhicule trouvé"}
+        })
+    end
+end)
+
+
+
+
