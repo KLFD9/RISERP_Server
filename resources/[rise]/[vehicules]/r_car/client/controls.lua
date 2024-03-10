@@ -196,6 +196,8 @@ RegisterKeyMapping('+toggleengine', 'Démarrer/Arrêter le moteur', 'keyboard', 
 
 
 
+local lastUpdate = 0 
+
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(2000)
@@ -237,7 +239,6 @@ Citizen.CreateThread(function()
         end
     end
 end)
-
 -- Mise à jour de la santé globale du véhicule avec prise en compte de la vitesse et des impacts
 ----------------------------------------------------------------------------------------
 local lastSpeed = 0
