@@ -1,131 +1,141 @@
--- Charger le fichier JSON
+-- Charger le fichier JSON des stations d'essence
 local file = LoadResourceFile(GetCurrentResourceName(), "GasStations.json")
-local data = json.decode(file)
-local gasStations = data.GasStations
+local gasStations = json.decode(file).GasStations
 
 -- Liste des modèles de pompes à essence
 local props = {
-    "prop_gas_pump_1d",
-    "prop_gas_pump_1a",
-    "prop_gas_pump_1b",
-    "prop_gas_pump_1c",
-    "prop_vintage_pump",
-    "prop_gas_pump_old2",
+    "prop_gas_pump_1d", "prop_gas_pump_1a", "prop_gas_pump_1b",
+    "prop_gas_pump_1c", "prop_vintage_pump", "prop_gas_pump_old2",
     "prop_gas_pump_old3"
 }
 
-local nearPump = false
-local soundPlayed = false
-
--- Fonction pour vérifier si un joueur est proche d'une pompe à essence référencée
-function isPlayerNearReferencedPump(player)
+-- Fonction pour vérifier si le joueur est près d'une pompe à essence
+function isPlayerNearPump()
+    local player = PlayerPedId()
     local playerPos = GetEntityCoords(player)
     for _, modelName in ipairs(props) do
         local modelHash = GetHashKey(modelName)
-        local pump = GetClosestObjectOfType(playerPos.x, playerPos.y, playerPos.z, 3.0, modelHash, false, false, false)
+        local pump = GetClosestObjectOfType(playerPos.x, playerPos.y, playerPos.z, 2.0, modelHash, false, false, false)
         if pump ~= 0 then
-            for _, station in ipairs(gasStations) do
-                for _, pumpCoord in ipairs(station.pumps) do
-                    local distance = GetDistanceBetweenCoords(playerPos.x, playerPos.y, playerPos.z, pumpCoord.X, pumpCoord.Y, pumpCoord.Z, true)
-                    if distance <= 2.0 then
-                        -- Vérifier si un véhicule est près de la pompe
-                        local vehicle = GetClosestVehicle(pumpCoord.X, pumpCoord.Y, pumpCoord.Z, 4.0, 0, 70)
-                        if vehicle ~= 0 then
-                            return true
-                        end
-                    end
-                end
-            end
+            return true, GetEntityCoords(pump)
         end
     end
     return false
 end
 
--- Fonction pour afficher une notification
+-- Affiche une notification
 function ShowNotification(text)
     SetNotificationTextEntry("STRING")
     AddTextComponentString(text)
     DrawNotification(false, false)
 end
 
-RegisterNetEvent('checkForGasPump')
-AddEventHandler('checkForGasPump', function()
-    local player = GetPlayerPed(-1)
-    if not IsPedInAnyVehicle(player, false) and isPlayerNearReferencedPump(player) then
-        if not nearPump then
-            ShowNotification("~y~Appuyez sur E pour faire le plein.")
-            nearPump = true  
-        end
-        if not soundPlayed then
-            PlaySoundFrontend(-1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", true)
-            soundPlayed = true  
-        end
-        Citizen.CreateThread(function()
-            while true do
-                Citizen.Wait(0)
-                if IsControlJustReleased(0, 38) then  -- Touche E
-                    ShowNotification("~g~Vous faites le plein.") 
-                    print("Le joueur a appuyé sur la touche E pour faire le plein.")
-                    TriggerEvent("refuel")
-                    break
-                end
-            end
-            nearPump = false  
-            soundPlayed = false 
-        end)
-    else
-        nearPump = false 
-        soundPlayed = false  
-    end
-end)
-
-
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(3000)
-        TriggerEvent('checkForGasPump')
-    end
-end)
-
--- animation de remplissage
-function StartRefuelingAnimation(player)
+-- Démarrer l'animation de remplissage
+function StartRefuelingAnimation()
     local dict = "timetable@gardener@filling_can"
-    local anim = "gar_ig_5_filling_can"
-
     RequestAnimDict(dict)
     while not HasAnimDictLoaded(dict) do
         Citizen.Wait(100)
     end
-
-    TaskPlayAnim(player, dict, anim, 8.0, -8, -1, 49, 0, false, false, false)
+    TaskPlayAnim(PlayerPedId(), dict, "gar_ig_5_filling_can", 8.0, -8, -1, 49, 0, false, false, false)
 end
 
-RegisterNetEvent('startRefueling')
-AddEventHandler('startRefueling', function()
-    local player = GetPlayerPed(-1)
-    local vehicle = GetVehiclePedIsIn(player, false)
-
-    if vehicle and not IsPedInAnyVehicle(player, true) and isPlayerNearReferencedPump(player) then
-        local maxFuelLevel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume')        
-        StartRefuelingAnimation(player)        
-        Citizen.Wait(5000)
-        ClearPedTasksImmediately(player)
-        SetVehicleFuelLevel(vehicle, maxFuelLevel)
-        TriggerServerEvent('server:UpdateFuelLevel', vehicle, maxFuelLevel)
-        ShowNotification("~g~Le véhicule est maintenant plein.")
+-- Processus de remplissage simplifié
+function RefuelProcess(vehicle)
+    if not vehicle or vehicle == 0 then
+        ShowNotification("Aucun véhicule détecté.")
+        return
     end
-end)
+
+    StartRefuelingAnimation()
+    Citizen.Wait(2000) -- Durée de l'animation réduite à 2 secondes
+    ClearPedTasksImmediately(PlayerPedId())
+    
+    -- Simuler le remplissage à 100%
+    local maxFuelLevel = 100
+    -- Pas besoin de plaque, opération directe sur l'entité du véhicule
+    SetVehicleFuelLevel(vehicle, maxFuelLevel)
+    ShowNotification("~g~Le véhicule est maintenant plein.")
+end
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(0)
-        if IsControlJustReleased(0, 38) then -- Touche E
-            local player = GetPlayerPed(-1)
-            if isPlayerNearReferencedPump(player) then
-                TriggerEvent('startRefueling')
+        Citizen.Wait(500)
+        local isNear, pumpPos = isPlayerNearPump()
+        if isNear then
+            local vehicle = GetClosestVehicleToPump(pumpPos)
+            if vehicle and not IsPedInAnyVehicle(PlayerPedId(), false) then
+                ShowNotification("~y~Appuyez sur E pour faire le plein.")
+                if IsControlJustReleased(0, 38) then -- Touche E
+                    RefuelProcess(vehicle)
+                end
             end
         end
     end
 end)
 
+-- Fonction pour obtenir le véhicule le plus proche de la pompe à essence
+function GetClosestVehicleToPump(pumpPos)
+    local vehicles = GetVehiclesInArea(pumpPos, 5.0) -- Ajuste la portée au besoin
+    local closestVehicle = nil
+    local minDistance = math.huge
 
+    for _, vehicle in pairs(vehicles) do
+        local vehiclePos = GetEntityCoords(vehicle)
+        local distance = #(vehiclePos - pumpPos)
+        if distance < minDistance then
+            closestVehicle = vehicle
+            minDistance = distance
+        end
+    end
+    
+    return closestVehicle
+end
+
+-- Fonction pour obtenir une liste des véhicules dans une zone donnée
+function GetVehiclesInArea(center, radius)
+    local vehicles = {}
+    for vehicle in EnumerateVehicles() do
+        if #(GetEntityCoords(vehicle) - center) <= radius then
+            table.insert(vehicles, vehicle)
+        end
+    end
+    return vehicles
+end
+
+-- Itérateur pour véhicules
+function EnumerateVehicles()
+    return EnumerateEntities(FindFirstVehicle, FindNextVehicle, EndFindVehicle)
+end
+
+-- Fonction générique d'itération sur des entités
+function EnumerateEntities(initFunc, moveFunc, disposeFunc)
+    return coroutine.wrap(function()
+        local iter, id = initFunc()
+        if not id or id == 0 then
+            disposeFunc(iter)
+            return
+        end
+        
+        local enum = {handle = iter, destructor = disposeFunc}
+        setmetatable(enum, entityEnumerator)
+        
+        local next = true
+        repeat
+            coroutine.yield(id)
+            next, id = moveFunc(iter)
+        until not next
+        
+        enum.destructor, enum.handle = nil, nil
+        disposeFunc(iter)
+    end)
+end
+
+entityEnumerator = {
+    __gc = function(enum)
+        if enum.destructor and enum.handle then
+            enum.destructor(enum.handle)
+        end
+        enum.destructor, enum.handle = nil, nil
+    end
+}

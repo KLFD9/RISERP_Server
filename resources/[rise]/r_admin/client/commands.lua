@@ -206,3 +206,9 @@ RegisterCommand('unban', function(source, args)
         end
     end
 end)
+
+-- Commande pour l'affichage de la position x y z en vector 3 dans la console sous le format x, y, z
+RegisterCommand('pos', function()
+    local x, y, z = table.unpack(GetEntityCoords(PlayerPedId()))
+    print(x, y, z) 
+end)

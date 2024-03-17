@@ -20,7 +20,7 @@ Citizen.CreateThread(function()
                 health = health
             })
         else
-            SendNUIMessage({ type = 'hideSpeedometer' })
+            SendNUIMessage({ type = 'hideSpeedometer' }) 
         end
     end
 end)

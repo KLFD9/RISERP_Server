@@ -1,7 +1,7 @@
 
 
 -- commande weather
-RegisterCommand('weather', function(source, args)
+RegisterCommand('meteo', function(source, args)
     if IsPlayerAdmin() then
         if args[1] then
             local weather = args[1]

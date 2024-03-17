@@ -117,12 +117,15 @@ end)
 
 
 --------------------------------------------------------------------------------
--- Régulateur de vitesse (cruise control)
+-- Régulateur de vitesse 
 --------------------------------------------------------------------------------
 
 local cruiseControlEnabled = false
 local cruiseControlSpeed = 0
 local soundId = GetSoundId()
+local maxSpeedKmh = 84.3 -- Vitesse maximale en km/h
+local maxSpeed = maxSpeedKmh / 3.6 -- Conversion de km/h en m/s
+
 
 local function disableCruiseControl(reason)
     cruiseControlEnabled = false
@@ -143,7 +146,12 @@ RegisterCommand('+togglecruisecontrol', function()
     cruiseControlEnabled = not cruiseControlEnabled
     if cruiseControlEnabled then
         cruiseControlSpeed = GetEntitySpeed(playerVehicle)        
-        PlaySoundFrontend(-1, "OK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false)
+        PlaySoundFrontend(-1, "OK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false)        
+        ThefeedNextPostBackgroundColor(6)
+        SetNotificationTextEntry("STRING")
+        AddTextComponentString("Régulateur de vitesse activé", 500) 
+        SetNotificationMessage("CHAR_CARSITE2", "CHAR_CARSITE2", true, 1, "~y~Cockpit", "")
+        DrawNotification(false, true)
     else
         disableCruiseControl()
     end
@@ -152,7 +160,7 @@ end)
 -- Maintien de la vitesse du véhicule
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(1000) 
+        Citizen.Wait(100) 
         if cruiseControlEnabled then
             local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
             if playerVehicle ~= 0 and GetIsVehicleEngineRunning(playerVehicle) then
@@ -160,11 +168,8 @@ Citizen.CreateThread(function()
                     disableCruiseControl()
                 else
                     local currentSpeed = GetEntitySpeed(playerVehicle)
-                    if math.abs(currentSpeed - cruiseControlSpeed) > 0.01 then
-                        
-                        if cruiseControlEnabled then
-                            SetVehicleForwardSpeed(playerVehicle, cruiseControlSpeed)
-                        end
+                    if currentSpeed > maxSpeed then
+                        SetVehicleForwardSpeed(playerVehicle, maxSpeed)
                     end
                 end
             else
@@ -180,6 +185,13 @@ local function disableCruiseControl(reason)
     cruiseControlEnabled = false
     cruiseControlSpeed = 0
     PlaySoundFrontend(-1, "CANCEL", "HUD_MINI_GAME_SOUNDSET", true)
+
+    -- Ajout du message de notification
+    ThefeedNextPostBackgroundColor(6)
+    SetNotificationTextEntry("STRING")
+    AddTextComponentString("Régulateur de vitesse désactivé", 500)
+    SetNotificationMessage("CHAR_CARSITE2", "CHAR_CARSITE2", true, 1, "~y~Cockpit", "")
+    DrawNotification(false, true)
 end
 
 --------------------------------------------------------------------------------
@@ -199,10 +211,10 @@ RegisterKeyMapping('+toggleengine', 'Démarrer/Arrêter le moteur', 'keyboard', 
 --------------------------------------------------------------------------------
 
 local lastUpdate = 0 
-local updateInterval = 1000  
+local updateInterval = 500  
 local previousTimestamp = 0  
 local previousSpeed = 0  
-local consumptionMultiplier = 1  
+local consumptionMultiplier = 0.5 
 
 Citizen.CreateThread(function()
     while true do
@@ -220,9 +232,13 @@ Citizen.CreateThread(function()
                     if currentSpeed < 0.1 then 
                         consumptionRate = 0.0001
                     else
+                        -- Calculer la consommation de carburant en fonction de la vitesse et de l'accélération
                         local deltaTime = (currentTime - previousTimestamp) / 1000.0 
+                        -- Calculer l'accélération en m/s^2
                         local acceleration = (currentSpeed - previousSpeed) / deltaTime
-                        consumptionRate = (0.0010 + acceleration * 0.0025 * currentSpeed) * consumptionMultiplier 
+                        -- Calculer la consommation de carburant en L/s
+                        consumptionRate = (0.0005 + acceleration * 0.0010 * currentSpeed) * consumptionMultiplier -- 0.0010 L/s à 0 km/h, 0.0035 L/s à 100 km/h
+                        -- Limiter la consommation de carburant à 0
                         consumptionRate = math.max(consumptionRate, 0)
                     end
 
@@ -230,12 +246,6 @@ Citizen.CreateThread(function()
                     newFuelLevel = math.max(newFuelLevel, 0)
                     local maxFuelLevel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume')
                     local fuelPercentage = (newFuelLevel / maxFuelLevel) * 100
-
-                    -- Envoyer le niveau de carburant à l'interface utilisateur
-                    SendNUIMessage({
-                        type = 'update',
-                        fuel = fuelPercentage
-                    })
 
                     SetVehicleFuelLevel(vehicle, newFuelLevel)
                     TriggerServerEvent('server:UpdateFuelLevel', newFuelLevel)
@@ -323,4 +333,5 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
 

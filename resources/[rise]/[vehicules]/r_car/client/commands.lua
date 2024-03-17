@@ -37,9 +37,10 @@ RegisterCommand("car", function(source, args)
         SetVehicleEngineHealth(vehicle, initialEngineHealth)
         SetVehicleBodyHealth(vehicle, initialBodyHealth)
 
-        local vehicleSpeedMph = math.floor(GetEntitySpeed(vehicle) * 3.6) -- Vitesse actuelle en km/h, arrondie à l'entier inférieur
-        local vehicleMaxSpeedMph = math.floor(GetVehicleMaxSpeed(vehicle) * 3.6) -- Vitesse maximale en km/h, arrondie à l'entier inférieur
-        local message = "Vehicle livré: " .. vehicleName .. ", Vitesse max: " .. vehicleMaxSpeedMph .. " Km/h"
+        local speedFactor = 4.689 -- Facteur de conversion ressenti
+        local vehicleSpeedKmh = math.floor(GetEntitySpeed(vehicle) * speedFactor) -- Vitesse actuelle en km/h, arrondie à l'entier inférieur
+        local vehicleMaxSpeedKmh = math.floor(GetVehicleMaxSpeed(vehicle) * speedFactor) -- Vitesse maximale en km/h, arrondie à l'entier inférieur
+        local message = "Vehicle livré: " .. vehicleName .. ", Vitesse max: " .. vehicleMaxSpeedKmh .. " Km/h"
        
         ThefeedNextPostBackgroundColor(184)
         SetNotificationTextEntry("STRING")
@@ -272,26 +273,5 @@ RegisterCommand("sup", function()
         })
     end
 end)
-
------------------------------------------------------------------------------------------------------------------------
--- Commande "refuel" simple
------------------------------------------------------------------------------------------------------------------------
-RegisterCommand("refuel", function()
-    local playerPed = GetPlayerPed(-1)
-    local vehicle = GetVehiclePedIsIn(playerPed, false)
-    local fuelLevel = GetVehicleFuelLevel(vehicle)
-    local maxFuelLevel = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fPetrolTankVolume")
-    local missingFuel = maxFuelLevel - fuelLevel
-
-    if missingFuel > 0 then
-        SetVehicleFuelLevel(vehicle, maxFuelLevel)
-        DecorSetFloat(vehicle, "_FUEL_LEVEL", maxFuelLevel)
-        ShowNotification("~y~Le Véhicule à maintenant le plein d'essence !")
-    else
-        ShowNotification("~g~Vous avez déja le plein du véhicule.")
-    end
-end)
-
-
 
 
