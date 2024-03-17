@@ -160,7 +160,7 @@ end)
 -- Maintien de la vitesse du véhicule
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(100) 
+        Citizen.Wait(500) 
         if cruiseControlEnabled then
             local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
             if playerVehicle ~= 0 and GetIsVehicleEngineRunning(playerVehicle) then
@@ -248,13 +248,15 @@ Citizen.CreateThread(function()
                     local fuelPercentage = (newFuelLevel / maxFuelLevel) * 100
 
                     SetVehicleFuelLevel(vehicle, newFuelLevel)
-                    TriggerServerEvent('server:UpdateFuelLevel', newFuelLevel)
+                    local playerCoords = GetEntityCoords(playerPed)
+                    TriggerServerEvent('server:UpdateFuelLevel', playerCoords, newFuelLevel)
                     if newFuelLevel <= 0 then
                         SetVehicleEngineOn(vehicle, false, false, true)
                     end
 
                     previousSpeed = currentSpeed
                     previousTimestamp = currentTime
+
                 end
             end
             lastUpdate = currentTime 

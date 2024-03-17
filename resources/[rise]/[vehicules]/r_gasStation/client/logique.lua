@@ -15,7 +15,7 @@ function isPlayerNearPump()
     local playerPos = GetEntityCoords(player)
     for _, modelName in ipairs(props) do
         local modelHash = GetHashKey(modelName)
-        local pump = GetClosestObjectOfType(playerPos.x, playerPos.y, playerPos.z, 2.0, modelHash, false, false, false)
+        local pump = GetClosestObjectOfType(playerPos.x, playerPos.y, playerPos.z, 5.0, modelHash, false, false, false)
         if pump ~= 0 then
             return true, GetEntityCoords(pump)
         end
@@ -41,33 +41,36 @@ function StartRefuelingAnimation()
 end
 
 -- Processus de remplissage simplifié
-function RefuelProcess(vehicle)
+function RefuelProcess(pumpPos)
+    print("RefuelProcess called with pumpPos: ", pumpPos) -- Log
+    local vehicle = GetClosestVehicleToPump(pumpPos)
     if not vehicle or vehicle == 0 then
         ShowNotification("Aucun véhicule détecté.")
+        print("Aucun véhicule détecté.") -- Log
         return
     end
-
+    print("Vehicle found: ", vehicle) -- Log
     StartRefuelingAnimation()
-    Citizen.Wait(2000) -- Durée de l'animation réduite à 2 secondes
+    Citizen.Wait(10000) -- Temps de l'animation augmenté à 58 secondes
     ClearPedTasksImmediately(PlayerPedId())
     
-    -- Simuler le remplissage à 100%
-    local maxFuelLevel = 100
-    -- Pas besoin de plaque, opération directe sur l'entité du véhicule
-    SetVehicleFuelLevel(vehicle, maxFuelLevel)
+    -- Remplir le réservoir à 100%
+    local newFuelLevel = 100.0
+    SetVehicleFuelLevel(vehicle, newFuelLevel)
     ShowNotification("~g~Le véhicule est maintenant plein.")
 end
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(500)
+        Citizen.Wait(100)
         local isNear, pumpPos = isPlayerNearPump()
         if isNear then
             local vehicle = GetClosestVehicleToPump(pumpPos)
             if vehicle and not IsPedInAnyVehicle(PlayerPedId(), false) then
                 ShowNotification("~y~Appuyez sur E pour faire le plein.")
                 if IsControlJustReleased(0, 38) then -- Touche E
-                    RefuelProcess(vehicle)
+                    RefuelProcess(pumpPos)
+                else
                 end
             end
         end
@@ -88,7 +91,6 @@ function GetClosestVehicleToPump(pumpPos)
             minDistance = distance
         end
     end
-    
     return closestVehicle
 end
 
