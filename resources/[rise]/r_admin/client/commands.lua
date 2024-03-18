@@ -207,8 +207,25 @@ RegisterCommand('unban', function(source, args)
     end
 end)
 
--- Commande pour l'affichage de la position x y z en vector 3 dans la console sous le format x, y, z
+-- Afficher la position du joueur en format vector3 dans la console client
 RegisterCommand('pos', function()
     local x, y, z = table.unpack(GetEntityCoords(PlayerPedId()))
-    print(x, y, z) 
+    print("vector3(" .. x .. ", " .. y .. ", " .. z .. ")")
+end)
+
+-- supprimer le vehicule le plus proche du joueur
+RegisterCommand('dv', function()
+    local ped = PlayerPedId()
+    local veh = GetVehiclePedIsIn(ped, false)
+    if veh ~= 0 then
+        SetEntityAsMissionEntity(veh, true, true)
+        DeleteVehicle(veh)
+    else
+        local pos = GetEntityCoords(ped)
+        local nearVeh = GetClosestVehicle(pos.x, pos.y, pos.z, 5.0, 0, 71)
+        if nearVeh ~= 0 then
+            SetEntityAsMissionEntity(nearVeh, true, true)
+            DeleteVehicle(nearVeh)
+        end
+    end
 end)
