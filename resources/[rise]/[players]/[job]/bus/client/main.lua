@@ -14,8 +14,8 @@ Citizen.CreateThread(function()
             if not onDuty then
                 spawnBusAtCoords(vector3(449.48, -583.37, 28.5))
                 onDuty = true
-                nextStop = math.random(1, #stops) -- Sélection initiale d'un arrêt aléatoire
-                proceedToNextStop() -- Immédiatement guidé vers le premier arrêt
+                nextStop = math.random(1, #stops)
+                proceedToNextStop() 
             end
         end
 
@@ -80,15 +80,15 @@ blips = {}
 function addBusStopBlips()
     for i, stop in ipairs(stops) do
         local blip = AddBlipForCoord(stop.x, stop.y, stop.z)
-        SetBlipSprite(blip, 513) -- Choisissez une icône appropriée pour les arrêts de bus
-        SetBlipDisplay(blip, 4) -- Affiche le blip sur la carte et le minimap
-        SetBlipScale(blip, 0.6) -- Définit la taille du blip
-        SetBlipColour(blip, 2) -- Définit la couleur du blip; 2 est le bleu
-        SetBlipAsShortRange(blip, true) -- Fait en sorte que le blip n'apparaisse que lorsqu'on est proche
+        SetBlipSprite(blip, 513) 
+        SetBlipDisplay(blip, 4) 
+        SetBlipScale(blip, 2) -- Définit la taille du blip
+        SetBlipColour(blip, 2)
+        SetBlipAsShortRange(blip, true)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentString("Arrêt de bus #"..i)
         EndTextCommandSetBlipName(blip)
-        table.insert(blips, blip) -- Stocke le blip créé dans le tableau blips si vous avez besoin de les référencer plus tard
+        table.insert(blips, blip)
     end
 end
 
@@ -108,7 +108,7 @@ function proceedToNextStop()
     local currentStop = nextStop
     repeat
         nextStop = math.random(1, #stops)
-    until nextStop ~= currentStop -- S'assure que le prochain arrêt n'est pas le même que l'arrêt actuel
+    until nextStop ~= currentStop
 
     local nextStopCoords = stops[nextStop]
     showScreenMessage("Dirigez-vous vers l'arrêt de bus #" .. nextStop, 5000)
@@ -125,7 +125,6 @@ end
 
 -- Fonction pour dessiner un texte 3D dans le monde
 function DrawText3D(x, y, z, text)
-    -- La logique de dessin du texte 3D reste inchangée
 end
 
 -- Gère le service en cours, y compris les arrêts de bus et la fin de service
@@ -133,7 +132,7 @@ function handleServiceManagement()
     local currentStop = stops[nextStop]
     guideToNextStop(currentStop)
     if hasReachedStop(PlayerPedId(), currentStop) then
-        proceedToNextStop() -- Sélection et guidage vers le prochain arrêt aléatoire
+        proceedToNextStop()
     end
 end
 
