@@ -1,9 +1,19 @@
+-- Liste des points d'arrêt
+print("Définition de stops")
+local stops = {
+    vector3(307.18, -766.03, 29.82), vector3(111.00, -783.56, 31.95),
+    vector3(-509.27, 19.47, 45.20), vector3(784.75, -774.98, 26.96),
+    vector3(771.18, -943.68, 26.23), vector3(787.75, -1369.13, 27.00),
+}
+
+
 -- Initialisation des blips pour les arrêts de bus au démarrage du script
 Citizen.CreateThread(function()
     local depotCoords = vector3(464.38, -622.16, 28.5)
     createDepotBlip(depotCoords)
-    addBusStopBlips() -- Appelle la fonction pour ajouter les blips
+    addBusStopBlips() 
 end)
+
 
 -- Gère les interactions principales du joueur, y compris commencer le travail et gérer les arrêts de bus
 Citizen.CreateThread(function()
@@ -67,12 +77,13 @@ function spawnBusAtCoords(coords)
     end
 end
 
--- Liste des points d'arrêt
-local stops = {
-    vector3(307.18, -766.03, 29.82), vector3(111.00, -783.56, 31.95),
-    vector3(-509.27, 19.47, 45.20), vector3(784.75, -774.98, 26.96),
-    vector3(771.18, -943.68, 26.23), vector3(787.75, -1369.13, 27.00),
-}
+
+Citizen.CreateThread(function()
+    print("Vérification de stops avant addBusStopBlips", #stops)
+    local depotCoords = vector3(464.38, -622.16, 28.5)
+    createDepotBlip(depotCoords)
+    addBusStopBlips() -- Appelle la fonction pour ajouter les blips
+end)
 
 blips = {}
 
@@ -105,6 +116,11 @@ end
 
 -- Sélectionne aléatoirement le prochain arrêt de bus et met à jour le waypoint GPS
 function proceedToNextStop()
+    if not stops or #stops == 0 then
+        print("Erreur: La liste des arrêts 'stops' n'est pas disponible.")
+        return
+    end
+    
     local currentStop = nextStop
     repeat
         nextStop = math.random(1, #stops)
@@ -115,6 +131,7 @@ function proceedToNextStop()
     SetNewWaypoint(nextStopCoords.x, nextStopCoords.y)
     PlaySoundFrontend(-1, "Bus_Arrive_At_Stop", "DLC_IND_BUS2_Sounds", true)
 end
+
 
 -- Affiche un message à l'écran
 function showScreenMessage(message, duration)
@@ -139,9 +156,80 @@ end
 -- Guide le joueur vers le prochain arrêt de bus et affiche un marqueur au sol
 function guideToNextStop(stop)
     DrawMarker(1, stop.x, stop.y, stop.z - 1.0001, 0, 0, 0, 0, 0, 0, 2.0, 2.0, 0.5, 255, 255, 0, 100, false, true, 2, false, false, false, false)
+
+    local playerPed = PlayerPedId()
+    local bus = GetVehiclePedIsIn(playerPed, false)
+    local stopCoords = vector3(stop.x, stop.y, stop.z)
+    
+    if GetDistanceBetweenCoords(GetEntityCoords(playerPed), stopCoords.x, stopCoords.y, stopCoords.z, true) < 10.0 then
+        DrawText3D(stopCoords.x, stopCoords.y, stopCoords.z, "Appuyez sur G pour charger/décharger les passagers")
+        if IsControlJustReleased(0, 73) then -- Touche X
+            unloadPassengersAtStop()
+            loadPassengersAtStop(stopCoords)
+        end
+    end
 end
 
 -- Vérifie si le joueur est dans une zone spécifiée autour d'un arrêt
 function hasReachedStop(playerPed, stop)
     return IsEntityInArea(playerPed, stop.x-1.0, stop.y-1.0, stop.z-1.0, stop.x+1.0, stop.y+1.0, stop.z+1.0, true, true, 0)
 end
+
+
+function loadPassengersAtStop(stopCoords)
+    local bus = GetVehiclePedIsIn(PlayerPedId(), false)
+    openBusDoors(bus)
+
+    local pedModel = GetHashKey("a_m_y_business_01")
+    RequestModel(pedModel)
+    while not HasModelLoaded(pedModel) do
+        Wait(1)
+    end
+
+    for i = 1, 3 do
+        local ped = CreatePed(4, pedModel, stopCoords.x + math.random(-5, 5), stopCoords.y + math.random(-5, 5), stopCoords.z, 0.0, true, false)
+        makePedPassive(ped)
+        TaskEnterVehicle(ped, bus, -1, -2, 1.0, 1, 0)
+    end
+
+    SetModelAsNoLongerNeeded(pedModel)
+    
+    Wait(5000) 
+    closeBusDoors(bus)
+end
+
+function makePedPassive(ped)
+    SetPedFleeAttributes(ped, 0, false)
+    SetPedCombatAttributes(ped, 17, true)
+    SetBlockingOfNonTemporaryEvents(ped, true)
+    SetPedCanBeDraggedOut(ped, false) 
+    SetPedCanRagdollFromPlayerImpact(ped, false)
+end
+
+
+function unloadPassengersAtStop()
+    local bus = GetVehiclePedIsIn(PlayerPedId(), false)
+    openBusDoors(bus)
+
+    for i=0, GetVehicleMaxNumberOfPassengers(bus) do
+        local ped = GetPedInVehicleSeat(bus, i)
+        if ped ~= 0 then 
+            TaskLeaveVehicle(ped, bus, 0)
+        end
+    end
+
+    Wait(5000)
+    closeBusDoors(bus)
+end
+
+function openBusDoors(bus)
+    SetVehicleDoorOpen(bus, 0, false, false) 
+    SetVehicleDoorOpen(bus, 1, false, false) 
+end
+
+function closeBusDoors(bus)
+    Wait(5000) 
+    SetVehicleDoorsShut(bus, false) 
+end
+
+
