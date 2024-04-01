@@ -9,5 +9,7 @@ version '1.0.0'
 
 
 client_script {
-    'client/commands.lua'
+    'client/commands.lua',
+    'client/finger.lua',
+    'client/markers.lua',
 }   
